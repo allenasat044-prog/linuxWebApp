@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Storage Monitor — Linux System Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F1EC;
+    --red: #FA4B42;
+    --black: #111111;
+    --dim: #837E76;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--cream); color: var(--black);
+    font-family: 'IBM Plex Mono', monospace;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  .site-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 48px; border-bottom: 2px solid var(--black);
+  }
+  .site-nav .logo { font-weight: 700; font-size: 0.95rem; letter-spacing: 0.01em; }
+  .site-nav .links { display: flex; gap: 28px; font-size: 0.8rem; letter-spacing: 0.03em; }
+  .site-nav .links a { text-decoration: none; color: var(--dim); padding-bottom: 4px; border-bottom: 2px solid transparent; }
+  .site-nav .links a:hover { color: var(--black); }
+  .site-nav .links a.active { color: var(--black); border-color: var(--red); }
+  .site-nav .gh { font-size: 0.78rem; text-decoration: none; color: var(--black); border: 1px solid var(--black); padding: 8px 16px; }
+  .site-nav .gh:hover { background: var(--black); color: var(--cream); }
+  @media (max-width: 640px) { .site-nav .links { display: none; } }
+  .hero {
+    flex: 1; position: relative;
+    display: grid; place-items: center;
+    padding: 80px 20px 100px;
+  }
+  .stack { position: relative; display: grid; place-items: center; }
+  .word-linux, .word-report { grid-area: 1 / 1; white-space: nowrap; }
+  .word-linux {
+    font-family: 'Archivo Black', sans-serif;
+    color: var(--red);
+    font-size: clamp(4.5rem, 15vw, 12rem);
+    line-height: 0.85;
+    background: none; border: none; cursor: pointer;
+    padding: 0; letter-spacing: -0.01em;
+    transition: color .18s ease, transform .18s ease;
+  }
+  .word-linux:hover { color: #E5372E; transform: scale(1.015); }
+  .word-linux:focus-visible { outline: 3px solid var(--black); outline-offset: 8px; }
+  .word-report {
+    font-family: 'Archivo Black', sans-serif;
+    color: var(--black);
+    font-size: clamp(1.6rem, 5vw, 3.2rem);
+    letter-spacing: 0.12em;
+    pointer-events: none;
+  }
+  .hint {
+    margin-top: 28px; font-size: 0.8rem; color: var(--dim);
+    letter-spacing: 0.04em; text-align: center;
+    opacity: 0; animation: fadeIn .6s ease .5s forwards;
+  }
+  @keyframes fadeIn { to { opacity: 1; } }
+  .open-btn {
+    margin-top: 22px;
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--black); color: var(--cream);
+    padding: 14px 28px; font-size: 0.82rem; letter-spacing: 0.04em; font-weight: 600;
+    border: none; cursor: pointer; text-decoration: none;
+  }
+  .open-btn:hover { background: var(--red); }
+  .open-btn:focus-visible { outline: 3px solid var(--black); outline-offset: 4px; }
+
+  footer {
+    padding: 28px 48px; display: flex; justify-content: space-between;
+    font-size: 0.75rem; color: var(--dim); letter-spacing: 0.02em;
+  }
+  footer a { color: var(--black); text-decoration: none; }
+  footer a:hover { color: var(--red); }
+
+  @media (prefers-reduced-motion: reduce) { .hint { animation: none; opacity: 1; } }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="logo">STORAGE·MONITOR</div>
+  <div class="links">
+    <a href="index.html" class="active">HOME</a>
+    <a href="dashboard.html">DASHBOARD</a>
+    <a href="product.html">PRODUCT</a>
+  </div>
+  <a class="gh" href="https://github.com/YOUR_GH_USER/storage-monitor">GITHUB</a>
+</nav>
+
+  <div class="hero">
+    <div class="stack">
+      <button class="word-linux" onclick="window.location.href='product.html'">LINUX</button>
+      <div class="word-report">SYSTEM REPORT</div>
+    </div>
+  </div>
+
+  <div style="text-align:center; margin-top:-70px; margin-bottom:60px;">
+    <div class="hint">Click "LINUX" for the product page — or open the dashboard below</div>
+    <a class="open-btn" href="dashboard.html">OPEN DASHBOARD →</a>
+  </div>
+
+  <footer>
+    <span>CLI toolkit for disk, inode &amp; migration monitoring</span>
+  </footer>
+
+</body>
+</html>

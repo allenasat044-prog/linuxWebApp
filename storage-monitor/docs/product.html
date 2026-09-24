@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Storage Monitor — CLI toolkit for disk, inode &amp; migration monitoring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #FF4D00;
+    --black: #0B0B0B;
+    --off-white: #F5F3EE;
+    --dim: #8A8A85;
+    --ok: #34D399;
+    --warn: #FBBF24;
+    --crit: #F87171;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--black);
+    color: var(--off-white);
+    font-family: 'IBM Plex Mono', monospace;
+    -webkit-font-smoothing: antialiased;
+  }
+  .display { font-family: 'Anton', sans-serif; text-transform: uppercase; line-height: 0.86; letter-spacing: -0.01em; }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+
+  /* ---------- nav ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--black);
+    border-bottom: 1px solid #232323;
+  }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+  .logo { font-family: 'Anton', sans-serif; font-size: 1.15rem; letter-spacing: 0.02em; }
+  .logo span { color: var(--orange); }
+  .navlinks { display: flex; gap: 36px; font-size: 0.8rem; letter-spacing: 0.03em; }
+  .navlinks a { color: var(--dim); border-bottom: 2px solid transparent; padding-bottom: 4px; transition: color .15s, border-color .15s; }
+  .navlinks a:hover { color: var(--off-white); border-color: var(--orange); }
+  .navlinks a.active { color: var(--off-white); border-color: var(--orange); }
+  .gh-btn { border: 1px solid var(--off-white); padding: 8px 18px; font-size: 0.78rem; letter-spacing: 0.03em; }
+  .gh-btn:hover { background: var(--off-white); color: var(--black); }
+
+  /* ---------- hero ---------- */
+  .hero {
+    background: var(--orange); color: var(--black);
+    padding: 90px 0 64px;
+    clip-path: polygon(0 0, 100% 0, 100% 96%, 0 100%);
+    margin-bottom: -40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero .wrap { position: relative; }
+  .hero h1 {
+    font-size: clamp(3.2rem, 10vw, 8.4rem);
+    opacity: 0; transform: translateY(24px);
+    animation: rise .7s cubic-bezier(.2,.7,.2,1) forwards;
+  }
+  .hero h1:nth-child(2) { animation-delay: .12s; }
+  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+  .hero .tagline {
+    margin-top: 28px; max-width: 460px;
+    font-size: 0.95rem; line-height: 1.55;
+  }
+  .hero-meta {
+    margin-top: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid rgba(11,11,11,0.25); padding-top: 22px;
+    font-size: 0.78rem; letter-spacing: 0.03em;
+  }
+  .scroll-badge {
+    width: 92px; height: 92px; border-radius: 50%;
+    border: 1px solid var(--black);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; flex-shrink: 0;
+  }
+  .scroll-badge svg { position: absolute; inset: 0; animation: spin 9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .scroll-badge::after { content: "↓"; font-size: 1.1rem; }
+  @media (prefers-reduced-motion: reduce) {
+    .hero h1 { animation: none; opacity: 1; transform: none; }
+    .scroll-badge svg { animation: none; }
+  }
+
+  /* ---------- sections ---------- */
+  section { padding: 100px 0; }
+  .eyebrow-rule { height: 3px; width: 56px; background: var(--orange); margin-bottom: 18px; }
+  h2.display { font-size: clamp(2rem, 5vw, 3.4rem); margin-bottom: 44px; color: var(--off-white); }
+
+  .features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #232323; border: 1px solid #232323; }
+  .feature { background: var(--black); padding: 36px 28px; }
+  .feature .num { font-family: 'Anton', sans-serif; color: var(--orange); font-size: 1.6rem; }
+  .feature h3 { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 1rem; margin: 14px 0 10px; }
+  .feature p { color: var(--dim); font-size: 0.85rem; line-height: 1.55; }
+  .feature code { display: block; margin-top: 16px; font-size: 0.75rem; color: var(--orange); background: #161616; padding: 8px 10px; overflow-x: auto; }
+
+  .install { background: #131313; }
+  .tabs { display: flex; gap: 2px; margin-bottom: 0; }
+  .tab { flex: 1; background: #1c1c1c; padding: 14px 18px; font-size: 0.78rem; letter-spacing: 0.03em; color: var(--dim); cursor: pointer; text-align: center; }
+  .tab.active { background: var(--black); color: var(--orange); border-top: 2px solid var(--orange); }
+  .panel { display: none; background: var(--black); border: 1px solid #232323; padding: 28px; }
+  .panel.active { display: block; }
+  .panel pre { font-size: 0.85rem; overflow-x: auto; line-height: 1.7; }
+  .panel .prompt { color: var(--orange); }
+
+  .cta { text-align: center; }
+  .cta h2.display { margin-bottom: 20px; }
+  .cta p { color: var(--dim); max-width: 480px; margin: 0 auto 36px; font-size: 0.9rem; line-height: 1.6; }
+  .btn-orange { display: inline-block; background: var(--orange); color: var(--black); padding: 16px 34px; font-size: 0.85rem; letter-spacing: 0.03em; font-weight: 600; }
+
+  footer { border-top: 1px solid #232323; padding: 36px 0; }
+  footer .wrap { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--dim); }
+  footer a:hover { color: var(--orange); }
+
+  @media (max-width: 860px) {
+    .navlinks { display: none; }
+    .features { grid-template-columns: 1fr 1fr; }
+    .tabs { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">STORAGE<span>·</span>MONITOR</div>
+    <div class="navlinks">
+      <a href="index.html">HOME</a>
+      <a href="dashboard.html">DASHBOARD</a>
+      <a href="product.html" class="active">PRODUCT</a>
+      <a href="#features">FEATURES</a>
+      <a href="#install">INSTALL</a>
+    </div>
+    <a class="gh-btn" href="https://github.com/YOUR_GH_USER/storage-monitor">GITHUB</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="wrap">
+    <h1 class="display">DISK IS</h1>
+    <h1 class="display">RUNNING OUT</h1>
+    <p class="tagline">A dependency-free Bash toolkit that watches disk space, inodes, and storage growth — and proves your migrations actually worked. No server, no login, no dashboard to maintain.</p>
+    <div class="hero-meta">
+      <span>NO DAEMON · NO DATABASE · NO LOGIN</span>
+      <div class="scroll-badge">
+        <svg viewBox="0 0 100 100"><path id="circlePath" fill="none" d="M 50,50 m -38,0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0"/><text font-size="8" letter-spacing="2" fill="#0B0B0B"><textPath href="#circlePath">SCROLL DOWN · SCROLL DOWN · </textPath></text></svg>
+      </div>
+      <span>BUILT FOR CRON &amp; SYSTEMD</span>
+    </div>
+  </div>
+</div>
+
+<section id="features">
+  <div class="wrap">
+    <div class="eyebrow-rule"></div>
+    <h2 class="display">What it watches</h2>
+    <div class="features">
+      <div class="feature">
+        <div class="num">01</div>
+        <h3>Disk usage</h3>
+        <p>Every mounted filesystem checked against WARN/CRIT thresholds you set — not a fixed default.</p>
+        <code>storage-monitor --json</code>
+      </div>
+      <div class="feature">
+        <div class="num">02</div>
+        <h3>Inode usage</h3>
+        <p>Catches the failure disk-percentage alone misses: plenty of space, zero inodes left.</p>
+        <code>df -iP /var</code>
+      </div>
+      <div class="feature">
+        <div class="num">03</div>
+        <h3>Storage growth</h3>
+        <p>Scheduled snapshots of the directories you care about, with alerts on sudden growth.</p>
+        <code>growth-tracker snapshot</code>
+      </div>
+      <div class="feature">
+        <div class="num">04</div>
+        <h3>Migration proof</h3>
+        <p>Before/after checksums across an entire directory tree — a real PASS or FAIL, not a guess.</p>
+        <code>migration-verify after ./dst demo</code>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="install" class="install">
+  <div class="wrap">
+    <div class="eyebrow-rule"></div>
+    <h2 class="display">Install it</h2>
+    <div class="tabs">
+      <div class="tab active" data-tab="curl">LINUX / WSL</div>
+      <div class="tab" data-tab="brew">MACOS (HOMEBREW)</div>
+      <div class="tab" data-tab="src">FROM SOURCE</div>
+    </div>
+    <div class="panel active" data-panel="curl">
+      <pre><span class="prompt">$</span> curl -fsSL https://raw.githubusercontent.com/YOUR_GH_USER/storage-monitor/main/dist/get.sh | bash</pre>
+    </div>
+    <div class="panel" data-panel="brew">
+      <pre><span class="prompt">$</span> brew tap YOUR_GH_USER/storage-monitor
+<span class="prompt">$</span> brew install storage-monitor</pre>
+    </div>
+    <div class="panel" data-panel="src">
+      <pre><span class="prompt">$</span> git clone https://github.com/YOUR_GH_USER/storage-monitor.git
+<span class="prompt">$</span> cd storage-monitor &amp;&amp; sudo ./install.sh</pre>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <h2 class="display">Run your first check</h2>
+    <p>One command tells you the current state of every mounted filesystem — no account, no setup wizard.</p>
+    <a class="btn-orange" href="#install">GET THE INSTALL COMMAND</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>BASED IN /var/log · MIT LICENSE</span>
+    <span><a href="https://github.com/YOUR_GH_USER/storage-monitor">GITHUB</a></span>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelector(`.panel[data-panel="${tab.dataset.tab}"]`).classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
