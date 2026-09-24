@@ -25,16 +25,7 @@ notice. For real numbers from an actual machine, run the CLI toolkit's own
 `generate-report` command, which produces a live HTML report from that
 machine's real `df`/`du` output (see the main project README).
 
-## Before publishing
 
-Every page contains a `YOUR_GH_USER` placeholder in its GitHub links. Replace
-it with your actual GitHub username before pushing:
-
-```bash
-cd docs
-sed -i '' 's/YOUR_GH_USER/<your-username>/g' index.html dashboard.html product.html   # macOS
-# sed -i 's/YOUR_GH_USER/<your-username>/g' index.html dashboard.html product.html    # Linux
-```
 
 ## Preview locally
 
