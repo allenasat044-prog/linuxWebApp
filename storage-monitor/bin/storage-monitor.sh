@@ -42,12 +42,15 @@ JSON_ROWS=()
 log_info "Starting storage scan (OS=${OS})"
 
 # ---------- gather filesystem list ----------
-# df -P gives POSIX-portable output across Linux/macOS
+# df -Pk gives POSIX-portable output in guaranteed 1024-byte (KB) blocks.
+# -P alone is NOT enough: GNU df defaults to 1KB blocks regardless of -P,
+# but BSD/macOS df -P defaults to 512-byte blocks - without -k, every
+# "size_kb" value silently came out exactly half its real size on macOS.
 if [[ -n "${MONITORED_MOUNTS}" ]]; then
     read -ra MOUNTS <<< "${MONITORED_MOUNTS}"
-    DF_LINES=$(df -P "${MOUNTS[@]}" 2>/dev/null | tail -n +2)
+    DF_LINES=$(df -Pk "${MOUNTS[@]}" 2>/dev/null | tail -n +2)
 else
-    DF_LINES=$(df -P -l 2>/dev/null | tail -n +2 | grep -Ev '^(tmpfs|devtmpfs|overlay|squashfs|udev)')
+    DF_LINES=$(df -Pk -l 2>/dev/null | tail -n +2 | grep -Ev '^(tmpfs|devtmpfs|overlay|squashfs|udev)')
 fi
 
 while IFS= read -r line; do

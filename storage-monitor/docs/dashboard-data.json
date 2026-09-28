@@ -1,0 +1,22 @@
+{
+  "generated": "2026-09-28T09:24:33+05:30",
+  "host": "Shashanks-Laptop.local",
+  "os": "macos",
+  "root_mount": "/",
+  "capacity_gb": 460.4,
+  "used_gb": 11.8,
+  "free_gb": 329.4,
+  "used_pct": 4,
+  "inode_pct": null,
+  "status": "OK",
+  "breakdown": [
+    {"label":"User Data","pct":0.0,"color":"#FA4B42"},
+    {"label":"System","pct":4.0,"color":"#111111"},
+    {"label":"Logs","pct":0.0,"color":"#837E76"},
+    {"label":"Cache / Temp","pct":0.0,"color":"#C9C2B6"},
+    {"label":"Free Space","pct":71.5,"color":"#F5F1EC"}
+  ],
+  "growth_history": [{"label":"09-26 08:46","gb":0.148},{"label":"09-28 09:24","gb":0.105}],
+  "growth_dir": "/var/log",
+  "growth_note": "Breakdown categories are a best-effort heuristic from configured MONITORED_DIRS, not an OS-level accounting."
+}

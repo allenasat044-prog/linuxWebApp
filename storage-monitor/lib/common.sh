@@ -69,12 +69,41 @@ send_alert() {
 }
 
 # ---------- helpers ----------
-# Convert a df size like "10G" / "512M" / "1024K" to MB (integer)
+# Convert a df size like "10G" / "512M" / "1024K" to MB (integer).
+# Pure awk, no numfmt dependency (numfmt is GNU-only; macOS doesn't ship
+# it, and Homebrew's coreutils installs it as "gnumfmt", not "numfmt",
+# unless the user manually adds its gnubin dir to PATH - relying on it
+# silently produced wrong/raw numbers on every Mac).
 to_mb() {
     local val="$1"
-    numfmt --from=iec --to-unit=1M "${val}" 2>/dev/null || echo 0
+    awk -v v="$val" 'BEGIN{
+        unit=substr(v,length(v),1);
+        num=substr(v,1,length(v)-1);
+        if (unit !~ /^[0-9]$/) {
+            if (unit=="K") mb=num/1024;
+            else if (unit=="M") mb=num;
+            else if (unit=="G") mb=num*1024;
+            else if (unit=="T") mb=num*1024*1024;
+            else mb=0;
+        } else {
+            mb=v/1024/1024; # assume raw bytes if no unit suffix
+        }
+        printf "%d", mb;
+    }'
 }
 
+# Format a raw byte count as human-readable (B/KB/MB/GB/TB), pure awk.
+# Always available - no external dependency, identical output on
+# Linux, macOS, and WSL regardless of what's installed.
 human_bytes() {
-    numfmt --to=iec --suffix=B "$1" 2>/dev/null || echo "$1"
+    local bytes="${1:-0}"
+    awk -v b="$bytes" 'BEGIN{
+        split("B KB MB GB TB PB", units, " ");
+        u = 1;
+        sign = (b < 0) ? "-" : "";
+        if (b < 0) b = -b;
+        while (b >= 1024 && u < 6) { b /= 1024; u++ }
+        if (u == 1) printf "%s%d%s", sign, b, units[u];
+        else        printf "%s%.1f%s", sign, b, units[u];
+    }'
 }

@@ -18,3 +18,23 @@ open docs/index.html
 open docs/dashboard.html
 open docs/product.html
 ````
+
+
+
+````bash
+tar -xzf ~/Downloads/storage-monitor.tar.gz
+cd ~/Downloads/linuxCheat/MAJOR/storage-monitor
+ls bin/
+
+chmod +x install.sh bin/*.sh dist/get.sh
+sudo ./install.sh
+
+growth-tracker snapshot
+sudo /opt/storage-monitor/bin/export-dashboard-data.sh
+cp /opt/storage-monitor/reports/dashboard-data.json ~/Downloads/linuxCheat/MAJOR/storage-monitor/docs/
+
+cd ~/Downloads/linuxCheat/MAJOR/storage-monitor/docs
+python3 -m http.server 8000
+
+#http://localhost:8000/dashboard.html
+````
